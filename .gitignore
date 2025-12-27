@@ -1,0 +1,10 @@
+# Ignorar archivos compilados
+backend/target/
+*.class
+
+# Ignorar configuraciones sensibles
+backend/src/main/resources/application.properties
+
+# Ignorar archivos del IDE (IntelliJ IDEA)
+.idea/
+*.iml
