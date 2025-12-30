@@ -1,4 +1,4 @@
-package com.marcos.exceptions;
+package com.marcos.exceptions.usuario;
 
 public class EmailAlreadyExistsException extends RuntimeException {
     public EmailAlreadyExistsException(String message) {

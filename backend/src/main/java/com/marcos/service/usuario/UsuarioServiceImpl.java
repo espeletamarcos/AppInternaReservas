@@ -2,12 +2,14 @@ package com.marcos.service.usuario;
 
 import com.marcos.dto.usuario.UsuarioRequestDTO;
 import com.marcos.dto.usuario.UsuarioResponseDTO;
-import com.marcos.exceptions.EmailAlreadyExistsException;
+import com.marcos.exceptions.usuario.EmailAlreadyExistsException;
+import com.marcos.exceptions.usuario.UsuarioNotFoundException;
 import com.marcos.model.entity.Usuario;
 import com.marcos.repository.UsuarioRepository;
-import org.hibernate.id.uuid.UuidGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 public class UsuarioServiceImpl implements UsuarioService {
 
@@ -34,6 +36,20 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .nombre(usuarioGuardado.getNombre())
                 .email(usuarioGuardado.getEmail())
                 .activo(usuarioGuardado.isActivo())
+                .build();
+        return responseDTO;
+    }
+
+    @Transactional
+    @Override
+    public UsuarioResponseDTO findUsuarioById(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado"));
+        UsuarioResponseDTO responseDTO = UsuarioResponseDTO.builder()
+                .id(usuario.getId())
+                .nombre(usuario.getNombre())
+                .email(usuario.getEmail())
+                .activo(usuario.isActivo())
                 .build();
         return responseDTO;
     }
