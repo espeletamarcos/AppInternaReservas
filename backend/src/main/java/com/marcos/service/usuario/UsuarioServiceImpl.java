@@ -9,7 +9,10 @@ import com.marcos.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class UsuarioServiceImpl implements UsuarioService {
 
@@ -52,5 +55,20 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .activo(usuario.isActivo())
                 .build();
         return responseDTO;
+    }
+
+    @Override
+    public List<UsuarioResponseDTO> listUsuarios() {
+        List<Usuario> listaUsuarios = usuarioRepository.findAll();
+        List<UsuarioResponseDTO> listaUsuariosDTO = listaUsuarios.stream() // El .stream es básicamente un bucle en una lista
+                .filter(Usuario::isActivo) // Sólo usuarios activos
+                .map(usuario -> UsuarioResponseDTO.builder() // Transforma cada elemento del map
+                        .id(usuario.getId())
+                        .nombre(usuario.getNombre())
+                        .email(usuario.getEmail())
+                        .activo(usuario.isActivo())
+                        .build())
+                .collect(Collectors.toList()); // Lo devuelve todo a una lista
+        return listaUsuariosDTO;
     }
 }
