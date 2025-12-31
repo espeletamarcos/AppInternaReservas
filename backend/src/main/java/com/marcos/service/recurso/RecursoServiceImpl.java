@@ -2,11 +2,16 @@ package com.marcos.service.recurso;
 
 import com.marcos.dto.recurso.RecursoRequestDTO;
 import com.marcos.dto.recurso.RecursoResponseDTO;
+import com.marcos.dto.usuario.UsuarioResponseDTO;
 import com.marcos.exceptions.recurso.NombreRecursoAlreadyExistsException;
+import com.marcos.exceptions.recurso.RecursoNotFoundException;
 import com.marcos.model.entity.Recurso;
 import com.marcos.repository.RecursoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class RecursoServiceImpl implements RecursoService {
 
@@ -33,6 +38,22 @@ public class RecursoServiceImpl implements RecursoService {
                 .nombre(recursoGuardado.getNombre())
                 .tipoRecurso(recursoGuardado.getTipoRecurso())
                 .activo(recursoGuardado.isActivo())
+                .build();
+        return recursoResponseDTO;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public RecursoResponseDTO findRecursoById(Long id) {
+        // Buscamos el Recurso y si no lo encuentra, lanza una excepción
+        Recurso recurso = recursoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNotFoundException("El recurso no se ha encontrado"));
+        // Si lo encuentra, construimos RecursoResponseDTO
+        RecursoResponseDTO recursoResponseDTO = RecursoResponseDTO.builder()
+                .id(recurso.getId())
+                .nombre(recurso.getNombre())
+                .tipoRecurso(recurso.getTipoRecurso())
+                .activo(recurso.isActivo())
                 .build();
         return recursoResponseDTO;
     }
