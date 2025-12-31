@@ -57,4 +57,21 @@ public class RecursoServiceImpl implements RecursoService {
                 .build();
         return recursoResponseDTO;
     }
+    
+    @Override
+    public List<RecursoResponseDTO> listRecursos() {
+        // Recibimos todos los recursos que encuentre el repositorio
+        List<Recurso> listaRecursos = recursoRepository.findAll();
+        // Los mapeamos a DTO
+        List<RecursoResponseDTO> listaResponseRecursos = listaRecursos.stream()
+                .filter(Recurso::isActivo)
+                .map(recurso -> RecursoResponseDTO.builder() // Transforma cada elemento del map
+                        .id(recurso.getId())
+                        .nombre(recurso.getNombre())
+                        .tipoRecurso(recurso.getTipoRecurso())
+                        .activo(recurso.isActivo())
+                        .build())
+                .toList();
+        return listaResponseRecursos;
+    }
 }
