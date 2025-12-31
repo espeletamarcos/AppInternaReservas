@@ -15,5 +15,5 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     List<Reserva> findByRecurso (Recurso recurso);
 
     // Para validar solapamientos
-    List<Reserva> findByRecursoDisponible (Recurso recurso, LocalDateTime fechaInicio, LocalDateTime fechaFin);
+    List<Reserva> findByRecursoAndFechaInicioLessThanAndFechaFinGreaterThan (Recurso recurso, LocalDateTime fechaInicio, LocalDateTime fechaFin);
 }
