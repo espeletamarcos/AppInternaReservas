@@ -5,6 +5,7 @@ import com.marcos.dto.reserva.ReservaResponseDTO;
 import com.marcos.exceptions.recurso.RecursoNotFoundException;
 import com.marcos.exceptions.reserva.InvalidReservationDateRangeException;
 import com.marcos.exceptions.reserva.RecursoNotAvailableException;
+import com.marcos.exceptions.reserva.ReservaNotFoundException;
 import com.marcos.exceptions.usuario.UsuarioNotFoundException;
 import com.marcos.model.entity.Recurso;
 import com.marcos.model.entity.Reserva;
@@ -66,6 +67,27 @@ public class ReservaServiceImpl implements ReservaService{
                 .fechaInicio(reservaGuardada.getFechaInicio())
                 .fechaFin(reservaGuardada.getFechaFin())
                 .estadoReserva(reservaGuardada.getEstadoReserva())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public ReservaResponseDTO findReservaById(Long id) {
+        // 1. Buscar Reserva
+        Reserva reserva = reservaRepository.findById(id)
+                .orElseThrow(() -> new ReservaNotFoundException("La reserva no ha sido encontrada"));
+        // 2. Validar que usuario y recurso estén activos
+        if (!reserva.getUsuario().isActivo() || !reserva.getRecurso().isActivo()) {
+            throw new ReservaNotFoundException("Reserva asociada a usuario o recurso inactivo");
+        }
+        // 3. Mapear a DTO y devolver
+        return ReservaResponseDTO.builder()
+                .id(reserva.getId())
+                .nombreUsuario(reserva.getUsuario().getNombre())
+                .nombreRecurso(reserva.getRecurso().getNombre())
+                .fechaInicio(reserva.getFechaInicio())
+                .fechaFin(reserva.getFechaFin())
+                .estadoReserva(reserva.getEstadoReserva())
                 .build();
     }
 }
