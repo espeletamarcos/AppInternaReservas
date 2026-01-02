@@ -34,13 +34,12 @@ public class UsuarioServiceImpl implements UsuarioService {
         //Guardamos en la base de datos
         Usuario usuarioGuardado = usuarioRepository.save(usuario);
         //Construimos el UsuarioResponseDTO
-        UsuarioResponseDTO responseDTO = UsuarioResponseDTO.builder()
+        return UsuarioResponseDTO.builder()
                 .id(usuarioGuardado.getId())
                 .nombre(usuarioGuardado.getNombre())
                 .email(usuarioGuardado.getEmail())
                 .activo(usuarioGuardado.isActivo())
                 .build();
-        return responseDTO;
     }
 
     @Transactional
@@ -48,19 +47,18 @@ public class UsuarioServiceImpl implements UsuarioService {
     public UsuarioResponseDTO findUsuarioById(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado"));
-        UsuarioResponseDTO responseDTO = UsuarioResponseDTO.builder()
+        return UsuarioResponseDTO.builder()
                 .id(usuario.getId())
                 .nombre(usuario.getNombre())
                 .email(usuario.getEmail())
                 .activo(usuario.isActivo())
                 .build();
-        return responseDTO;
     }
 
     @Override
     public List<UsuarioResponseDTO> listUsuarios() {
         List<Usuario> listaUsuarios = usuarioRepository.findAll();
-        List<UsuarioResponseDTO> listaUsuariosDTO = listaUsuarios.stream() // El .stream es básicamente un bucle en una lista
+        return listaUsuarios.stream() // El .stream es básicamente un bucle en una lista
                 .filter(Usuario::isActivo) // Sólo usuarios activos
                 .map(usuario -> UsuarioResponseDTO.builder() // Transforma cada elemento del map
                         .id(usuario.getId())
@@ -68,7 +66,6 @@ public class UsuarioServiceImpl implements UsuarioService {
                         .email(usuario.getEmail())
                         .activo(usuario.isActivo())
                         .build())
-                .collect(Collectors.toList()); // Lo devuelve todo a una lista
-        return listaUsuariosDTO;
+                .collect(Collectors.toList()); // Lo devuelve tdo a una lista
     }
 }

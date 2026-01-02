@@ -33,13 +33,12 @@ public class RecursoServiceImpl implements RecursoService {
         // Guardamos la entidad en la base de datos
         Recurso recursoGuardado = recursoRepository.save(recurso);
         // Construimos el RecursoResponseDTO
-        RecursoResponseDTO recursoResponseDTO = RecursoResponseDTO.builder() // Optimizar con devolver solo el builder
+        return RecursoResponseDTO.builder() // Optimizar con devolver solo el builder
                 .id(recursoGuardado.getId())
                 .nombre(recursoGuardado.getNombre())
                 .tipoRecurso(recursoGuardado.getTipoRecurso())
                 .activo(recursoGuardado.isActivo())
                 .build();
-        return recursoResponseDTO;
     }
 
     @Transactional(readOnly = true)
@@ -49,21 +48,20 @@ public class RecursoServiceImpl implements RecursoService {
         Recurso recurso = recursoRepository.findById(id)
                 .orElseThrow(() -> new RecursoNotFoundException("El recurso no se ha encontrado"));
         // Si lo encuentra, construimos RecursoResponseDTO
-        RecursoResponseDTO recursoResponseDTO = RecursoResponseDTO.builder()
+        return RecursoResponseDTO.builder()
                 .id(recurso.getId())
                 .nombre(recurso.getNombre())
                 .tipoRecurso(recurso.getTipoRecurso())
                 .activo(recurso.isActivo())
                 .build();
-        return recursoResponseDTO;
     }
-    
+
     @Override
     public List<RecursoResponseDTO> listRecursos() {
         // Recibimos todos los recursos que encuentre el repositorio
         List<Recurso> listaRecursos = recursoRepository.findAll();
         // Los mapeamos a DTO
-        List<RecursoResponseDTO> listaResponseRecursos = listaRecursos.stream()
+        return listaRecursos.stream()
                 .filter(Recurso::isActivo)
                 .map(recurso -> RecursoResponseDTO.builder() // Transforma cada elemento del map
                         .id(recurso.getId())
@@ -72,6 +70,5 @@ public class RecursoServiceImpl implements RecursoService {
                         .activo(recurso.isActivo())
                         .build())
                 .toList();
-        return listaResponseRecursos;
     }
 }
