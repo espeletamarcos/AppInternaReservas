@@ -1,6 +1,7 @@
 package com.marcos.dto.reserva;
 
 import com.marcos.model.enums.EstadoReserva;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@Builder
 public class ReservaResponseDTO {
 
     private Long id;
