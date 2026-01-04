@@ -7,6 +7,7 @@ import com.marcos.exceptions.usuario.UsuarioNotFoundException;
 import com.marcos.model.entity.Usuario;
 import com.marcos.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -14,10 +15,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Service
 public class UsuarioServiceImpl implements UsuarioService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
+
+    public UsuarioServiceImpl(UsuarioRepository usuarioRepository) {
+        this.usuarioRepository = usuarioRepository;
+    }
 
     @Transactional
     @Override
@@ -66,6 +71,6 @@ public class UsuarioServiceImpl implements UsuarioService {
                         .email(usuario.getEmail())
                         .activo(usuario.isActivo())
                         .build())
-                .collect(Collectors.toList()); // Lo devuelve tdo a una lista
+                .toList();
     }
 }

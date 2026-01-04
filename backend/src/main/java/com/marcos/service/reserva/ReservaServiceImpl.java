@@ -3,6 +3,7 @@ package com.marcos.service.reserva;
 import com.marcos.dto.reserva.ReservaRequestDTO;
 import com.marcos.dto.reserva.ReservaResponseDTO;
 import com.marcos.exceptions.recurso.RecursoNotFoundException;
+import com.marcos.exceptions.reserva.InvalidReservaState;
 import com.marcos.exceptions.reserva.InvalidReservationDateRangeException;
 import com.marcos.exceptions.reserva.RecursoNotAvailableException;
 import com.marcos.exceptions.reserva.ReservaNotFoundException;
@@ -15,22 +16,24 @@ import com.marcos.repository.RecursoRepository;
 import com.marcos.repository.ReservaRepository;
 import com.marcos.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class ReservaServiceImpl implements ReservaService{
 
-    // todo Hacerlo con constructor
-    @Autowired
-    private ReservaRepository reservaRepository;
+    private final ReservaRepository reservaRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final RecursoRepository recursoRepository;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
-    @Autowired
-    private RecursoRepository recursoRepository;
+    public ReservaServiceImpl(ReservaRepository reservaRepository, UsuarioRepository usuarioRepository, RecursoRepository recursoRepository) {
+        this.reservaRepository = reservaRepository;
+        this.usuarioRepository = usuarioRepository;
+        this.recursoRepository = recursoRepository;
+    }
 
     @Transactional
     @Override
@@ -107,7 +110,7 @@ public class ReservaServiceImpl implements ReservaService{
                         .fechaFin(reserva.getFechaFin())
                         .estadoReserva(reserva.getEstadoReserva())
                         .build())
-                .collect(Collectors.toList()); // todo simplificarlo simplemente a .toList()
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -129,7 +132,7 @@ public class ReservaServiceImpl implements ReservaService{
                         .fechaFin(reserva.getFechaFin())
                         .estadoReserva(reserva.getEstadoReserva())
                         .build())
-                .collect(Collectors.toList()); // todo simplificarlo simplemente a .toList()
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -151,7 +154,7 @@ public class ReservaServiceImpl implements ReservaService{
                         .fechaFin(reserva.getFechaFin())
                         .estadoReserva(reserva.getEstadoReserva())
                         .build())
-                .collect(Collectors.toList()); // todo simplificarlo simplemente a .toList()
+                .toList();
     }
 
     @Transactional
@@ -162,7 +165,7 @@ public class ReservaServiceImpl implements ReservaService{
                 .orElseThrow(() -> new ReservaNotFoundException("Reserva no encontrada"));
         // 2. Verificar estado o lanzar excepción
         if(reserva.getEstadoReserva() != EstadoReserva.ACTIVA) {
-            throw new InvalidReservationState("Sólo se pueden cancelar reservas activas");
+            throw new InvalidReservaState("Sólo se pueden cancelar reservas activas");
         }
         // 3. Modificar estado
         reserva.setEstadoReserva(EstadoReserva.CANCELADA);

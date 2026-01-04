@@ -8,15 +8,20 @@ import com.marcos.exceptions.recurso.RecursoNotFoundException;
 import com.marcos.model.entity.Recurso;
 import com.marcos.repository.RecursoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class RecursoServiceImpl implements RecursoService {
 
-    @Autowired
-    private RecursoRepository recursoRepository;
+    private final RecursoRepository recursoRepository;
+
+    public RecursoServiceImpl(RecursoRepository recursoRepository) {
+        this.recursoRepository = recursoRepository;
+    }
 
     @Transactional
     @Override
