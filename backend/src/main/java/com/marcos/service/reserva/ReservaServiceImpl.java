@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ReservaServiceImpl implements ReservaService{
 
@@ -89,5 +90,24 @@ public class ReservaServiceImpl implements ReservaService{
                 .fechaFin(reserva.getFechaFin())
                 .estadoReserva(reserva.getEstadoReserva())
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<ReservaResponseDTO> listReservas() {
+        // 1. Obtener la lista de entidades
+        List<Reserva> listaReservas = reservaRepository.findAll();
+        // 2. Mapear a una List de ResponseDTO
+        return listaReservas.stream()
+                .filter(reserva -> reserva.getEstadoReserva() == EstadoReserva.ACTIVA || reserva.getEstadoReserva() == EstadoReserva.FINALIZADA)
+                .map(reserva -> ReservaResponseDTO.builder()
+                        .id(reserva.getId())
+                        .nombreUsuario(reserva.getUsuario().getNombre())
+                        .nombreRecurso(reserva.getRecurso().getNombre())
+                        .fechaInicio(reserva.getFechaInicio())
+                        .fechaFin(reserva.getFechaFin())
+                        .estadoReserva(reserva.getEstadoReserva())
+                        .build())
+                .collect(Collectors.toList()); // todo simplificarlo simplemente a .toList()
     }
 }
