@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ReservaServiceImpl implements ReservaService{
@@ -131,5 +130,51 @@ public class ReservaServiceImpl implements ReservaService{
                         .estadoReserva(reserva.getEstadoReserva())
                         .build())
                 .collect(Collectors.toList()); // todo simplificarlo simplemente a .toList()
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<ReservaResponseDTO> listReservasByRecurso(Long id) {
+        // 1. Obtener recurso o lanzar excepción
+        Recurso recurso = recursoRepository.findById(id).filter(Recurso::isActivo)
+                .orElseThrow(() -> new RecursoNotFoundException("Recurso no encontrado"));
+        // 2. Obtener lista de entidades por recurso
+        List<Reserva> listaReservasByRecurso = reservaRepository.findByRecurso(recurso);
+        // 3. Mapear y devolver en DTO
+        return listaReservasByRecurso.stream()
+                .filter(reserva -> reserva.getEstadoReserva() == EstadoReserva.ACTIVA || reserva.getEstadoReserva() == EstadoReserva.FINALIZADA)
+                .map(reserva -> ReservaResponseDTO.builder()
+                        .id(reserva.getId())
+                        .nombreUsuario(reserva.getUsuario().getNombre())
+                        .nombreRecurso(reserva.getRecurso().getNombre())
+                        .fechaInicio(reserva.getFechaInicio())
+                        .fechaFin(reserva.getFechaFin())
+                        .estadoReserva(reserva.getEstadoReserva())
+                        .build())
+                .collect(Collectors.toList()); // todo simplificarlo simplemente a .toList()
+    }
+
+    @Transactional
+    @Override
+    public ReservaResponseDTO cancelarReserva(Long id) {
+        // 1. Buscar Reserva o lanzar excepción
+        Reserva reserva = reservaRepository.findById(id)
+                .orElseThrow(() -> new ReservaNotFoundException("Reserva no encontrada"));
+        // 2. Verificar estado o lanzar excepción
+        if(reserva.getEstadoReserva() != EstadoReserva.ACTIVA) {
+            throw new InvalidReservationState("Sólo se pueden cancelar reservas activas");
+        }
+        // 3. Modificar estado
+        reserva.setEstadoReserva(EstadoReserva.CANCELADA);
+        Reserva reservaGuardada = reservaRepository.save(reserva);
+        // 4. Devolver DTO
+        return ReservaResponseDTO.builder()
+                .id(reservaGuardada.getId())
+                .nombreUsuario(reservaGuardada.getUsuario().getNombre())
+                .nombreRecurso(reservaGuardada.getRecurso().getNombre())
+                .fechaInicio(reservaGuardada.getFechaInicio())
+                .fechaFin(reservaGuardada.getFechaFin())
+                .estadoReserva(reservaGuardada.getEstadoReserva())
+                .build();
     }
 }
