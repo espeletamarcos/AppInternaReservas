@@ -110,4 +110,26 @@ public class ReservaServiceImpl implements ReservaService{
                         .build())
                 .collect(Collectors.toList()); // todo simplificarlo simplemente a .toList()
     }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<ReservaResponseDTO> listReservasByUsuario(Long id) {
+        // 1. Obtener usuario o lanzar excepción
+        Usuario usuario = usuarioRepository.findById(id).filter(Usuario::isActivo)
+                .orElseThrow(() -> new UsuarioNotFoundException("Usuario no encontrado"));
+        // 2. Obtener lista de entidades por usuario
+        List<Reserva> listaReservasByUsuario = reservaRepository.findByUsuario(usuario);
+        // 3. Mapear y devolver en DTO
+        return listaReservasByUsuario.stream()
+                .filter(reserva -> reserva.getEstadoReserva() == EstadoReserva.ACTIVA || reserva.getEstadoReserva() == EstadoReserva.FINALIZADA)
+                .map(reserva -> ReservaResponseDTO.builder()
+                        .id(reserva.getId())
+                        .nombreUsuario(reserva.getUsuario().getNombre())
+                        .nombreRecurso(reserva.getRecurso().getNombre())
+                        .fechaInicio(reserva.getFechaInicio())
+                        .fechaFin(reserva.getFechaFin())
+                        .estadoReserva(reserva.getEstadoReserva())
+                        .build())
+                .collect(Collectors.toList()); // todo simplificarlo simplemente a .toList()
+    }
 }
