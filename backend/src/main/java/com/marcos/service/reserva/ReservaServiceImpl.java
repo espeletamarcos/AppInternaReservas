@@ -49,7 +49,7 @@ public class ReservaServiceImpl implements ReservaService{
         Recurso recurso = recursoRepository.findById(requestDTO.getRecursoId()).filter(Recurso::isActivo)
                 .orElseThrow(() -> new RecursoNotFoundException("Recurso no encontrado"));
         // 4. Validar Disponibilidad
-        List<Reserva> listaReservas = reservaRepository.findByRecursoAndFechaInicioLessThanAndFechaFinGreaterThan(recurso, requestDTO.getFechaInicio(), requestDTO.getFechaFin());
+        List<Reserva> listaReservas = reservaRepository.findByRecursoAndFechaInicioLessThanAndFechaFinGreaterThan(recurso, requestDTO.getFechaFin(), requestDTO.getFechaInicio());
         if(!listaReservas.isEmpty()) {
             throw new RecursoNotAvailableException("El recurso no está disponible para las fechas seleccionadas");
         }
