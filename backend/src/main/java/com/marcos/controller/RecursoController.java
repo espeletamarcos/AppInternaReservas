@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/recursos")
+@CrossOrigin(origins = "http://localhost:4200")
 public class RecursoController {
 
     private final RecursoService recursoService;
