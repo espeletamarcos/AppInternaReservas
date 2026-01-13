@@ -31,7 +31,7 @@ Se utilizan DTOs de **request** y **response** para mantener una API limpia, seg
 - Spring Data JPA
 - Hibernate
 - Validation API
-- Base de datos H2 / PostgreSQL
+- Base de datos PostgreSQL
 
 ### Frontend
 - Angular
